@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Shield, AlertTriangle, Eye, Lock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,11 +34,7 @@ export default function ProtectedRoute({
   const [accessDenied, setAccessDenied] = useState(false);
   const [denialReason, setDenialReason] = useState('');
 
-  useEffect(() => {
-    checkAccess();
-  }, [isAuthenticated, user]);
-
-  const checkAccess = () => {
+  const checkAccess = useCallback(() => {
     setIsChecking(true);
     setAccessDenied(false);
 
@@ -67,7 +63,11 @@ export default function ProtectedRoute({
     }
 
     setIsChecking(false);
-  };
+  }, [requireAuth, isAuthenticated, requireRole, user, requirePermission, hasPermission, router]);
+
+  useEffect(() => {
+    checkAccess();
+  }, [checkAccess]);
 
   if (isChecking) {
     return <LoadingFallback />;

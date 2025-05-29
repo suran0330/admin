@@ -260,12 +260,18 @@ class AuthService {
   }
 
   private saveSessionToStorage(): void {
+    // Skip during SSR
+    if (typeof window === 'undefined') return;
+
     if (this.session) {
       localStorage.setItem('auth_session', JSON.stringify(this.session));
     }
   }
 
   private loadSessionFromStorage(): void {
+    // Skip during SSR
+    if (typeof window === 'undefined') return;
+
     try {
       const stored = localStorage.getItem('auth_session');
       if (stored) {
@@ -286,6 +292,9 @@ class AuthService {
   }
 
   private clearSessionFromStorage(): void {
+    // Skip during SSR
+    if (typeof window === 'undefined') return;
+
     localStorage.removeItem('auth_session');
   }
 

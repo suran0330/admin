@@ -170,7 +170,7 @@ export interface StoreSettings {
 export interface WebhookEvent {
   id: string;
   type: 'order.created' | 'order.updated' | 'product.updated' | 'customer.created' | 'payment.completed';
-  data: any;
+  data: Record<string, unknown>;
   timestamp: string;
   processed: boolean;
 }
@@ -178,7 +178,7 @@ export interface WebhookEvent {
 class StoreAPI {
   private config: StoreConfig;
   private websocket: WebSocket | null = null;
-  private eventListeners: Map<string, Function[]> = new Map();
+  private eventListeners: Map<string, ((data: unknown) => void)[]> = new Map();
 
   constructor(config: StoreConfig) {
     this.config = config;
@@ -263,7 +263,7 @@ class StoreAPI {
   }
 
   // Handle real-time WebSocket messages
-  private handleWebSocketMessage(data: any) {
+  private handleWebSocketMessage(data: Record<string, unknown>) {
     const { type, payload } = data;
 
     // Emit events to listeners
@@ -290,14 +290,14 @@ class StoreAPI {
   }
 
   // Event listener management
-  public on(event: string, listener: Function) {
+  public on(event: string, listener: (data: unknown) => void) {
     if (!this.eventListeners.has(event)) {
       this.eventListeners.set(event, []);
     }
     this.eventListeners.get(event)!.push(listener);
   }
 
-  public off(event: string, listener: Function) {
+  public off(event: string, listener: (data: unknown) => void) {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
       const index = listeners.indexOf(listener);
@@ -307,7 +307,7 @@ class StoreAPI {
     }
   }
 
-  private emit(event: string, data: any) {
+  private emit(event: string, data: unknown) {
     const listeners = this.eventListeners.get(event) || [];
     listeners.forEach(listener => listener(data));
   }
@@ -443,11 +443,11 @@ class StoreAPI {
     return this.request<Analytics>(`/analytics?timeRange=${timeRange}`);
   }
 
-  async getProductAnalytics(productId: string, timeRange: Analytics['timeRange'] = '30d'): Promise<any> {
+  async getProductAnalytics(productId: string, timeRange: Analytics['timeRange'] = '30d'): Promise<Record<string, unknown>> {
     return this.request(`/analytics/products/${productId}?timeRange=${timeRange}`);
   }
 
-  async getCustomerAnalytics(timeRange: Analytics['timeRange'] = '30d'): Promise<any> {
+  async getCustomerAnalytics(timeRange: Analytics['timeRange'] = '30d'): Promise<Record<string, unknown>> {
     return this.request(`/analytics/customers?timeRange=${timeRange}`);
   }
 
@@ -464,14 +464,14 @@ class StoreAPI {
   }
 
   // Design synchronization
-  async syncTheme(theme: any): Promise<{ success: boolean; message: string }> {
+  async syncTheme(theme: Record<string, unknown>): Promise<{ success: boolean; message: string }> {
     return this.request('/design/theme', {
       method: 'POST',
       body: JSON.stringify(theme),
     });
   }
 
-  async syncLayout(page: string, layout: any): Promise<{ success: boolean; message: string }> {
+  async syncLayout(page: string, layout: Record<string, unknown>): Promise<{ success: boolean; message: string }> {
     return this.request(`/design/layouts/${page}`, {
       method: 'PUT',
       body: JSON.stringify(layout),

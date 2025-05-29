@@ -36,7 +36,7 @@ export interface LayoutSection {
   type: 'hero' | 'product-grid' | 'banner' | 'testimonials' | 'content-block' | 'before-after' | 'featured-products';
   position: number;
   visible: boolean;
-  settings: Record<string, any>;
+  settings: Record<string, unknown>;
   customCSS?: string;
 }
 
@@ -54,15 +54,15 @@ export interface PageLayout {
 export interface ComponentSettings {
   id: string;
   component: string;
-  props: Record<string, any>;
+  props: Record<string, unknown>;
   styling: {
     className: string;
     customCSS: string;
   };
   responsive: {
-    mobile: Record<string, any>;
-    tablet: Record<string, any>;
-    desktop: Record<string, any>;
+    mobile: Record<string, unknown>;
+    tablet: Record<string, unknown>;
+    desktop: Record<string, unknown>;
   };
 }
 
@@ -232,12 +232,12 @@ class DesignAPI {
   }
 
   // Preview Management
-  async previewChanges(changes: any): Promise<string> {
+  async previewChanges(changes: Record<string, unknown>): Promise<string> {
     // Generate preview URL with changes
     return `${this.baseUrl}/preview?changes=${encodeURIComponent(JSON.stringify(changes))}`;
   }
 
-  async publishChanges(changes: any): Promise<boolean> {
+  async publishChanges(changes: Record<string, unknown>): Promise<boolean> {
     // Publish changes to live site
     console.log('Publishing changes:', changes);
     return true;

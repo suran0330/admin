@@ -13,6 +13,13 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
   const router = useRouter();
+
+  // Handle SSR gracefully
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const { login, isAuthenticated, isLoading } = useAuth();
 
   const [formData, setFormData] = useState({
@@ -30,7 +37,7 @@ export default function LoginPage() {
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (isAuthenticated && !isLoading) {
+    if (typeof window !== 'undefined' && isAuthenticated && !isLoading) {
       router.push('/');
     }
   }, [isAuthenticated, isLoading, router]);
@@ -87,7 +94,7 @@ export default function LoginPage() {
     }));
   };
 
-  if (isLoading) {
+  if (!isMounted || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">

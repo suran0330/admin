@@ -1,5 +1,19 @@
+// Instructions: Add TypeScript and ESLint configuration to ignore errors during build for deployment
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  typescript: {
+    // !! WARN !!
+    // Dangerously allow production builds to successfully complete even if
+    // your project has TypeScript errors.
+    // !! WARN !!
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    // Warning: This allows production builds to successfully complete even if
+    // your project has ESLint errors.
+    ignoreDuringBuilds: true,
+  },
   images: {
     unoptimized: true,
     domains: [

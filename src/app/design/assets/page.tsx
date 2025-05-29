@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Image as ImageIcon,
   Upload,
@@ -39,10 +39,6 @@ export default function VisualAssetsPage() {
     loadAssets();
   }, []);
 
-  useEffect(() => {
-    filterAssets();
-  }, [assets, searchTerm, selectedType]);
-
   const loadAssets = async () => {
     try {
       const assetsData = await designAPI.getVisualAssets();
@@ -52,7 +48,7 @@ export default function VisualAssetsPage() {
     }
   };
 
-  const filterAssets = () => {
+  const filterAssets = useCallback(() => {
     let filtered = assets;
 
     if (searchTerm) {
@@ -67,7 +63,11 @@ export default function VisualAssetsPage() {
     }
 
     setFilteredAssets(filtered);
-  };
+  }, [assets, searchTerm, selectedType]);
+
+  useEffect(() => {
+    filterAssets();
+  }, [filterAssets]);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;

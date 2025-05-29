@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
 import { getAuthService, type User, type AuthSession, type LoginCredentials, type UserRole, type Resource, type Action } from '@/lib/auth';
 import { initializeStoreAPI, getStoreAPI, defaultStoreConfig } from '@/lib/store-api';
 
@@ -23,7 +23,7 @@ interface AuthContextType {
   isAdmin: () => boolean;
 
   // User management
-  updatePreferences: (preferences: any) => Promise<{ success: boolean; message: string }>;
+  updatePreferences: (preferences: Record<string, unknown>) => Promise<{ success: boolean; message: string }>;
   enableTwoFactor: () => Promise<{ success: boolean; qrCode?: string; backupCodes?: string[]; message: string }>;
   disableTwoFactor: (code: string) => Promise<{ success: boolean; message: string }>;
 }
@@ -40,12 +40,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState(true);
   const authService = getAuthService();
 
-  useEffect(() => {
-    // Initialize authentication on mount
-    initializeAuth();
-  }, []);
-
-  const initializeAuth = async () => {
+  const initializeAuth = useCallback(async () => {
     try {
       setIsLoading(true);
 
@@ -70,7 +65,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    // Initialize authentication on mount
+    initializeAuth();
+  }, [initializeAuth]);
 
   const setupStoreConnection = () => {
     const storeAPI = getStoreAPI();
@@ -191,7 +191,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return authService.isAdmin();
   };
 
-  const updatePreferences = async (preferences: any) => {
+  const updatePreferences = async (preferences: Record<string, unknown>) => {
     const result = await authService.updatePreferences(preferences);
 
     if (result.success && session) {
