@@ -139,27 +139,149 @@ class AuthService {
   // Authentication methods
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      // Mock authentication for demo purposes
+      const demoUsers = {
+        'admin@inkey.com': {
+          id: 'admin-1',
+          email: 'admin@inkey.com',
+          name: 'Admin User',
+          firstName: 'Admin',
+          lastName: 'User',
+          role: 'admin' as UserRole,
+          permissions: ROLE_PERMISSIONS.admin,
+          department: 'Administration',
+          createdAt: '2024-01-01T00:00:00Z',
+          lastLoginAt: new Date().toISOString(),
+          isActive: true,
+          twoFactorEnabled: false,
+          preferences: {
+            theme: 'light' as const,
+            language: 'en',
+            timezone: 'UTC',
+            notifications: {
+              email: true,
+              push: true,
+              slack: false
+            },
+            dashboard: {
+              defaultView: 'overview',
+              widgets: ['products', 'analytics', 'orders']
+            }
+          }
         },
-        body: JSON.stringify(credentials),
-      });
+        'designer@inkey.com': {
+          id: 'designer-1',
+          email: 'designer@inkey.com',
+          name: 'Design User',
+          firstName: 'Design',
+          lastName: 'User',
+          role: 'designer' as UserRole,
+          permissions: ROLE_PERMISSIONS.designer,
+          department: 'Design',
+          createdAt: '2024-01-01T00:00:00Z',
+          lastLoginAt: new Date().toISOString(),
+          isActive: true,
+          twoFactorEnabled: false,
+          preferences: {
+            theme: 'light' as const,
+            language: 'en',
+            timezone: 'UTC',
+            notifications: {
+              email: true,
+              push: true,
+              slack: false
+            },
+            dashboard: {
+              defaultView: 'design',
+              widgets: ['design', 'assets', 'themes']
+            }
+          }
+        },
+        'viewer@inkey.com': {
+          id: 'viewer-1',
+          email: 'viewer@inkey.com',
+          name: 'Viewer User',
+          firstName: 'Viewer',
+          lastName: 'User',
+          role: 'viewer' as UserRole,
+          permissions: ROLE_PERMISSIONS.viewer,
+          department: 'General',
+          createdAt: '2024-01-01T00:00:00Z',
+          lastLoginAt: new Date().toISOString(),
+          isActive: true,
+          twoFactorEnabled: false,
+          preferences: {
+            theme: 'light' as const,
+            language: 'en',
+            timezone: 'UTC',
+            notifications: {
+              email: true,
+              push: false,
+              slack: false
+            },
+            dashboard: {
+              defaultView: 'overview',
+              widgets: ['products', 'analytics']
+            }
+          }
+        }
+      };
 
-      const data: AuthResponse = await response.json();
+      const demoPasswords = {
+        'admin@inkey.com': 'admin123',
+        'designer@inkey.com': 'design123',
+        'viewer@inkey.com': 'view123'
+      };
 
-      if (data.success && data.user && data.token) {
-        await this.setSession({
-          user: data.user,
-          token: data.token,
-          refreshToken: data.refreshToken || '',
-          expiresAt: Date.now() + (8 * 60 * 60 * 1000), // 8 hours
-          permissions: this.getUserPermissions(data.user),
-        });
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Check credentials
+      const user = demoUsers[credentials.email as keyof typeof demoUsers];
+      const expectedPassword = demoPasswords[credentials.email as keyof typeof demoPasswords];
+
+      if (!user || credentials.password !== expectedPassword) {
+        return {
+          success: false,
+          message: 'Invalid email or password. Please check your credentials and try again.',
+        };
       }
 
-      return data;
+      // Check 2FA if required
+      if (credentials.twoFactorCode && !user.twoFactorEnabled) {
+        return {
+          success: false,
+          message: 'Two-factor authentication code not required for this account.',
+        };
+      }
+
+      if (user.twoFactorEnabled && !credentials.twoFactorCode) {
+        return {
+          success: false,
+          requiresTwoFactor: true,
+          message: 'Please enter your two-factor authentication code.',
+        };
+      }
+
+      // Create session
+      const sessionData = {
+        user,
+        token: `demo-token-${Date.now()}`,
+        refreshToken: `demo-refresh-${Date.now()}`,
+        expiresAt: Date.now() + (8 * 60 * 60 * 1000), // 8 hours
+        permissions: this.getUserPermissions(user),
+      };
+
+      await this.setSession(sessionData);
+
+      return {
+        success: true,
+        user,
+        token: sessionData.token,
+        refreshToken: sessionData.refreshToken,
+        message: 'Login successful!',
+      };
+
     } catch (error) {
       console.error('Login error:', error);
       return {
@@ -171,76 +293,21 @@ class AuthService {
 
   async logout(): Promise<void> {
     try {
-      if (this.session?.token) {
-        await fetch('/api/auth/logout', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${this.session.token}`,
-          },
-        });
-      }
+      // For demo, just clear the session
+      this.clearSession();
     } catch (error) {
       console.error('Logout error:', error);
-    } finally {
-      this.clearSession();
     }
   }
 
   async refreshToken(): Promise<boolean> {
-    if (!this.session?.refreshToken) {
-      return false;
+    // For demo, just extend the current session
+    if (this.session) {
+      this.session.expiresAt = Date.now() + (8 * 60 * 60 * 1000);
+      this.saveSessionToStorage();
+      return true;
     }
-
-    try {
-      const response = await fetch('/api/auth/refresh', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          refreshToken: this.session.refreshToken,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.success && data.token) {
-        this.session.token = data.token;
-        this.session.expiresAt = Date.now() + (8 * 60 * 60 * 1000);
-        this.saveSessionToStorage();
-        return true;
-      }
-
-      return false;
-    } catch (error) {
-      console.error('Token refresh error:', error);
-      return false;
-    }
-  }
-
-  async changePassword(currentPassword: string, newPassword: string): Promise<{ success: boolean; message: string }> {
-    if (!this.session?.token) {
-      return { success: false, message: 'Not authenticated' };
-    }
-
-    try {
-      const response = await fetch('/api/auth/change-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.session.token}`,
-        },
-        body: JSON.stringify({
-          currentPassword,
-          newPassword,
-        }),
-      });
-
-      return await response.json();
-    } catch (error) {
-      console.error('Change password error:', error);
-      return { success: false, message: 'Failed to change password' };
-    }
+    return false;
   }
 
   // Session management
@@ -339,16 +406,6 @@ class AuthService {
     );
   }
 
-  public getAccessibleResources(): Resource[] {
-    if (!this.session) return [];
-
-    return Array.from(new Set(
-      this.session.permissions
-        .filter(p => p.actions.includes('view'))
-        .map(p => p.resource)
-    ));
-  }
-
   public isSuperAdmin(): boolean {
     return this.session?.user.role === 'super_admin';
   }
@@ -374,119 +431,32 @@ class AuthService {
     return this.session !== null && this.session.expiresAt > Date.now();
   }
 
-  public getAuthHeaders(): HeadersInit {
-    if (!this.session?.token) {
-      throw new Error('No authentication token available');
-    }
-
-    return {
-      'Authorization': `Bearer ${this.session.token}`,
-      'Content-Type': 'application/json',
-    };
-  }
-
-  // User preferences
+  // User preferences (mock implementation)
   async updatePreferences(preferences: Partial<UserPreferences>): Promise<{ success: boolean; message: string }> {
-    if (!this.session?.token) {
+    if (!this.session?.user) {
       return { success: false, message: 'Not authenticated' };
     }
 
-    try {
-      const response = await fetch('/api/auth/preferences', {
-        method: 'PUT',
-        headers: this.getAuthHeaders(),
-        body: JSON.stringify(preferences),
-      });
+    // Update preferences locally for demo
+    this.session.user.preferences = { ...this.session.user.preferences, ...preferences };
+    this.saveSessionToStorage();
 
-      const data = await response.json();
-
-      if (data.success && this.session.user) {
-        this.session.user.preferences = { ...this.session.user.preferences, ...preferences };
-        this.saveSessionToStorage();
-      }
-
-      return data;
-    } catch (error) {
-      console.error('Update preferences error:', error);
-      return { success: false, message: 'Failed to update preferences' };
-    }
+    return { success: true, message: 'Preferences updated successfully' };
   }
 
-  // Two-factor authentication
+  // Two-factor authentication (mock implementation)
   async enableTwoFactor(): Promise<{ success: boolean; qrCode?: string; backupCodes?: string[]; message: string }> {
-    if (!this.session?.token) {
-      return { success: false, message: 'Not authenticated' };
-    }
-
-    try {
-      const response = await fetch('/api/auth/2fa/enable', {
-        method: 'POST',
-        headers: this.getAuthHeaders(),
-      });
-
-      return await response.json();
-    } catch (error) {
-      console.error('Enable 2FA error:', error);
-      return { success: false, message: 'Failed to enable two-factor authentication' };
-    }
+    return {
+      success: true,
+      qrCode: 'demo-qr-code',
+      backupCodes: ['123456', '234567', '345678'],
+      message: 'Two-factor authentication enabled'
+    };
   }
 
   async disableTwoFactor(code: string): Promise<{ success: boolean; message: string }> {
-    if (!this.session?.token) {
-      return { success: false, message: 'Not authenticated' };
-    }
-
-    try {
-      const response = await fetch('/api/auth/2fa/disable', {
-        method: 'POST',
-        headers: this.getAuthHeaders(),
-        body: JSON.stringify({ code }),
-      });
-
-      return await response.json();
-    } catch (error) {
-      console.error('Disable 2FA error:', error);
-      return { success: false, message: 'Failed to disable two-factor authentication' };
-    }
+    return { success: true, message: 'Two-factor authentication disabled' };
   }
-}
-
-// Permission checking utilities
-export function requirePermission(resource: Resource, action: Action) {
-  return (target: any, propertyName: string, descriptor: PropertyDescriptor) => {
-    const method = descriptor.value;
-
-    descriptor.value = function (...args: any[]) {
-      const auth = getAuthService();
-
-      if (!auth.isAuthenticated()) {
-        throw new Error('Authentication required');
-      }
-
-      if (!auth.hasPermission(resource, action)) {
-        throw new Error(`Insufficient permissions: ${action} ${resource}`);
-      }
-
-      return method.apply(this, args);
-    };
-  };
-}
-
-export function requireRole(role: UserRole) {
-  return (target: any, propertyName: string, descriptor: PropertyDescriptor) => {
-    const method = descriptor.value;
-
-    descriptor.value = function (...args: any[]) {
-      const auth = getAuthService();
-      const user = auth.getUser();
-
-      if (!user || user.role !== role) {
-        throw new Error(`Role ${role} required`);
-      }
-
-      return method.apply(this, args);
-    };
-  };
 }
 
 // Export singleton instance
