@@ -235,7 +235,7 @@ export default function SettingsPage() {
                   min="0"
                   max="1"
                   value={settings.store.taxRate}
-                  onChange={(e) => handleInputChange('store', 'taxRate', parseFloat(e.target.value))}
+                  onChange={(e) => handleInputChange('store', 'taxRate', Number.parseFloat(e.target.value))}
                 />
               </div>
               <div>
@@ -245,7 +245,7 @@ export default function SettingsPage() {
                   step="0.01"
                   min="0"
                   value={settings.store.shippingRate}
-                  onChange={(e) => handleInputChange('store', 'shippingRate', parseFloat(e.target.value))}
+                  onChange={(e) => handleInputChange('store', 'shippingRate', Number.parseFloat(e.target.value))}
                 />
               </div>
               <div>
@@ -255,7 +255,7 @@ export default function SettingsPage() {
                   step="0.01"
                   min="0"
                   value={settings.store.freeShippingThreshold}
-                  onChange={(e) => handleInputChange('store', 'freeShippingThreshold', parseFloat(e.target.value))}
+                  onChange={(e) => handleInputChange('store', 'freeShippingThreshold', Number.parseFloat(e.target.value))}
                 />
               </div>
             </CardContent>

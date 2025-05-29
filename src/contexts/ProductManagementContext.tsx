@@ -1,6 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import type React from 'react';
+import { createContext, useContext, useState, useCallback } from 'react';
 import { products as initialProducts } from '@/data/products';
 import type { Product } from '@/data/products';
 import type { ShopifyProductNormalized } from '@/types/shopify';

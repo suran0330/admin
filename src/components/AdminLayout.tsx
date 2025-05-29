@@ -1,4 +1,4 @@
-// ... existing code ... <original imports and interfaces>
+"use client";
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -32,6 +32,52 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import StoreConnectionStatus from '@/components/StoreConnectionStatus';
+
+// Navigation configuration
+const navigation = [
+  { 
+    name: 'Dashboard', 
+    href: '/admin', 
+    icon: BarChart3,
+    permission: { resource: 'dashboard', action: 'read' }
+  },
+  { 
+    name: 'Products', 
+    href: '/admin/products', 
+    icon: Package,
+    permission: { resource: 'products', action: 'read' }
+  },
+  { 
+    name: 'Categories', 
+    href: '/admin/categories', 
+    icon: Settings,
+    permission: { resource: 'categories', action: 'read' }
+  },
+  { 
+    name: 'Analytics', 
+    href: '/admin/analytics', 
+    icon: BarChart3,
+    permission: { resource: 'analytics', action: 'read' }
+  },
+  { 
+    name: 'Users', 
+    href: '/admin/users', 
+    icon: Users,
+    permission: { resource: 'users', action: 'read' }
+  },
+  { 
+    name: 'Settings', 
+    href: '/admin/settings', 
+    icon: Settings,
+    permission: { resource: 'settings', action: 'read' }
+  },
+  { 
+    name: 'Help', 
+    href: '/admin/help', 
+    icon: HelpCircle,
+    permission: { resource: 'help', action: 'read' }
+  },
+];
 
 // ... existing code ... <interfaces remain the same>
 
