@@ -1,203 +1,316 @@
-import { Package, ShoppingCart, Users, TrendingUp, AlertTriangle, CheckCircle, ExternalLink, Palette, Layout, Grid, Image } from 'lucide-react';
+"use client";
+
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import {
+  BarChart3,
+  Package,
+  Users,
+  ShoppingCart,
+  TrendingUp,
+  Eye,
+  Edit,
+  Plus,
+  RefreshCw,
+  Zap,
+  Settings,
+  Activity,
+  Globe
+} from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { Badge } from '@/components/ui/badge';
 import AdminLayout from '@/components/AdminLayout';
+import StoreConnectionStatus from '@/components/StoreConnectionStatus';
+import { useAuth } from '@/contexts/AuthContext';
+import { realStoreAPI, type RealProduct } from '@/lib/real-store-api';
 
-export default function AdminDashboard() {
-  // Mock data - in a real app, this would come from your API
-  const stats = [
-    {
-      title: 'Design Elements',
-      value: '45',
-      change: '+5 this week',
-      positive: true,
-      icon: Palette,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50'
-    },
-    {
-      title: 'Active Layouts',
-      value: '8',
-      change: '+2 new layouts',
-      positive: true,
-      icon: Layout,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50'
-    },
-    {
-      title: 'Visual Assets',
-      value: '127',
-      change: '+18 this month',
-      positive: true,
-      icon: Image,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50'
-    },
-    {
-      title: 'Components',
-      value: '23',
-      change: '+3 customized',
-      positive: true,
-      icon: Grid,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50'
+export default function DashboardPage() {
+  const { user, hasPermission } = useAuth();
+  const [products, setProducts] = useState<RealProduct[]>([]);
+  const [analytics, setAnalytics] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [lastSync, setLastSync] = useState<string>('');
+
+  useEffect(() => {
+    loadDashboardData();
+
+    // Listen for store updates
+    if (typeof window !== 'undefined') {
+      const handleStoreUpdate = () => {
+        loadDashboardData();
+        setLastSync(new Date().toLocaleTimeString());
+      };
+
+      window.addEventListener('store-product-updated', handleStoreUpdate);
+
+      return () => {
+        window.removeEventListener('store-product-updated', handleStoreUpdate);
+      };
     }
-  ];
+  }, []);
 
-  const recentActivity = [
-    { type: 'design', message: 'Updated homepage hero section colors', time: '2 hours ago', user: 'Admin' },
-    { type: 'layout', message: 'Added new product showcase section', time: '4 hours ago', user: 'Admin' },
-    { type: 'theme', message: 'Published new color theme changes', time: '6 hours ago', user: 'Admin' },
-    { type: 'asset', message: 'Uploaded 5 new product images', time: '8 hours ago', user: 'Admin' },
-    { type: 'component', message: 'Customized product card styling', time: '1 day ago', user: 'Admin' }
-  ];
+  const loadDashboardData = async () => {
+    try {
+      setIsLoading(true);
+      const [productsData, analyticsData] = await Promise.all([
+        realStoreAPI.getProducts(),
+        Promise.resolve(realStoreAPI.getAnalytics())
+      ]);
 
-  const designTools = [
-    {
-      name: 'Theme Manager',
-      href: '/design/themes',
-      icon: Palette,
-      description: 'Customize colors, fonts, and styling',
-      status: 'active'
-    },
-    {
-      name: 'Layout Builder',
-      href: '/design/layouts',
-      icon: Layout,
-      description: 'Design page structures and sections',
-      status: 'active'
-    },
-    {
-      name: 'Asset Library',
-      href: '/design/assets',
-      icon: Image,
-      description: 'Manage images, icons, and media',
-      status: 'active'
-    },
-    {
-      name: 'Component Studio',
-      href: '/design/components',
-      icon: Grid,
-      description: 'Customize UI components',
-      status: 'beta'
+      setProducts(productsData);
+      setAnalytics(analyticsData);
+    } catch (error) {
+      console.error('Failed to load dashboard data:', error);
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  };
+
+  const handleRefreshData = async () => {
+    await loadDashboardData();
+    setLastSync(new Date().toLocaleTimeString());
+  };
+
+  const featuredProducts = products.filter(p => p.featured).slice(0, 3);
+  const recentProducts = products
+    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+    .slice(0, 3);
+
+  if (isLoading) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading dashboard...</p>
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
-      <div className="space-y-8">
+      <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Design Dashboard</h1>
-            <p className="text-gray-600">Manage your website's appearance and user experience</p>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Welcome back, {user?.firstName || user?.name || 'Admin'}
+            </h1>
+            <p className="text-gray-600">
+              Here's what's happening with your INKEY List store today
+            </p>
+            {lastSync && (
+              <p className="text-xs text-gray-500 mt-1">
+                Last synced: {lastSync}
+              </p>
+            )}
           </div>
-
-          <div className="flex items-center space-x-4">
-            <a
-              href="https://inkey-list-clone.netlify.app"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              <ExternalLink className="h-4 w-4 mr-2" />
-              View Live Site
-            </a>
-            <Link href="/design">
-              <Button className="bg-black hover:bg-gray-800">
-                <Palette className="h-4 w-4 mr-2" />
-                Design Studio
-              </Button>
-            </Link>
+          <div className="flex items-center space-x-3">
+            <Button variant="outline" onClick={handleRefreshData}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Refresh Data
+            </Button>
+            {hasPermission('products', 'create') && (
+              <Link href="/products/new">
+                <Button className="bg-black hover:bg-gray-800">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Product
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat) => (
-            <Card key={stat.title}>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                    <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
-                    <p className={`text-sm ${stat.positive ? 'text-green-600' : 'text-red-600'}`}>
-                      {stat.change}
-                    </p>
+        {/* Store Connection Status */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            {/* Key Metrics */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-3">
+                    <Package className="h-8 w-8 text-blue-600" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Total Products</p>
+                      <p className="text-2xl font-bold">{analytics?.total || 0}</p>
+                    </div>
                   </div>
-                  <div className={`p-3 rounded-full ${stat.bgColor}`}>
-                    <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <div className="w-3 h-3 bg-green-500 rounded-full" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">In Stock</p>
+                      <p className="text-2xl font-bold text-green-600">{analytics?.inStock || 0}</p>
+                    </div>
                   </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                      <Zap className="h-4 w-4 text-yellow-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Featured</p>
+                      <p className="text-2xl font-bold text-yellow-600">{analytics?.featured || 0}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                      <div className="w-3 h-3 bg-red-500 rounded-full" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Out of Stock</p>
+                      <p className="text-2xl font-bold text-red-600">{analytics?.outOfStock || 0}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Quick Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {hasPermission('products', 'view') && (
+                    <Link href="/products">
+                      <Button variant="outline" className="w-full justify-start">
+                        <Package className="h-4 w-4 mr-2" />
+                        Manage Products
+                      </Button>
+                    </Link>
+                  )}
+
+                  {hasPermission('design', 'view') && (
+                    <Link href="/design">
+                      <Button variant="outline" className="w-full justify-start">
+                        <Edit className="h-4 w-4 mr-2" />
+                        Edit Design
+                      </Button>
+                    </Link>
+                  )}
+
+                  {hasPermission('analytics', 'view') && (
+                    <Link href="/analytics">
+                      <Button variant="outline" className="w-full justify-start">
+                        <BarChart3 className="h-4 w-4 mr-2" />
+                        View Analytics
+                      </Button>
+                    </Link>
+                  )}
+
+                  {hasPermission('settings', 'view') && (
+                    <Link href="/settings">
+                      <Button variant="outline" className="w-full justify-start">
+                        <Settings className="h-4 w-4 mr-2" />
+                        Settings
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               </CardContent>
             </Card>
-          ))}
+          </div>
+
+          {/* Connection Status */}
+          <div>
+            <StoreConnectionStatus className="mb-6" />
+
+            {/* System Status */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Activity className="h-4 w-4 mr-2" />
+                  System Status
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Dashboard</span>
+                  <Badge className="bg-green-100 text-green-800">Operational</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Store API</span>
+                  <Badge className="bg-green-100 text-green-800">Connected</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Live Preview</span>
+                  <Badge className="bg-green-100 text-green-800">Available</Badge>
+                </div>
+                <div className="pt-2 border-t border-gray-100">
+                  <Link
+                    href="https://inkey-list-clone.netlify.app"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-600 hover:text-blue-800 flex items-center"
+                  >
+                    <Globe className="h-3 w-3 mr-1" />
+                    View Live Store
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Design Tools */}
+        {/* Featured Products */}
+        {featuredProducts.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle>Design Tools</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {designTools.map((tool) => (
-                  <Link
-                    key={tool.name}
-                    href={tool.href}
-                    className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors group"
-                  >
-                    <div className="p-2 bg-white rounded-lg mr-4 group-hover:bg-gray-50">
-                      <tool.icon className="h-5 w-5 text-gray-600" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2">
-                        <h3 className="font-medium text-gray-900">{tool.name}</h3>
-                        {tool.status === 'beta' && (
-                          <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">
-                            Beta
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-500">{tool.description}</p>
-                    </div>
+              <CardTitle className="flex items-center justify-between">
+                <span>Featured Products</span>
+                {hasPermission('products', 'view') && (
+                  <Link href="/products?filter=featured">
+                    <Button variant="outline" size="sm">
+                      <Eye className="h-4 w-4 mr-2" />
+                      View All
+                    </Button>
                   </Link>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Recent Design Activity */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Design Activity</CardTitle>
+                )}
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {recentActivity.map((activity, index) => (
-                  <div key={index} className="flex items-start space-x-3">
-                    <div className={`p-2 rounded-full ${
-                      activity.type === 'design' ? 'bg-purple-100' :
-                      activity.type === 'layout' ? 'bg-blue-100' :
-                      activity.type === 'theme' ? 'bg-green-100' :
-                      activity.type === 'asset' ? 'bg-orange-100' :
-                      activity.type === 'component' ? 'bg-pink-100' : 'bg-gray-100'
-                    }`}>
-                      {activity.type === 'design' && <Palette className="h-4 w-4 text-purple-600" />}
-                      {activity.type === 'layout' && <Layout className="h-4 w-4 text-blue-600" />}
-                      {activity.type === 'theme' && <CheckCircle className="h-4 w-4 text-green-600" />}
-                      {activity.type === 'asset' && <Image className="h-4 w-4 text-orange-600" />}
-                      {activity.type === 'component' && <Grid className="h-4 w-4 text-pink-600" />}
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-gray-900">{activity.message}</p>
-                      <div className="flex items-center justify-between mt-1">
-                        <p className="text-xs text-gray-500">{activity.time}</p>
-                        <p className="text-xs text-gray-500">by {activity.user}</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {featuredProducts.map((product) => (
+                  <div key={product.id} className="border rounded-lg p-4 hover:border-gray-300 transition-colors">
+                    <div className="flex items-center space-x-3">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-12 h-12 rounded-lg object-cover"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-gray-900 truncate">{product.name}</h3>
+                        <p className="text-sm text-gray-500">{product.price}</p>
+                        <div className="flex items-center space-x-2 mt-1">
+                          <Badge variant="outline" className="text-xs">
+                            {product.category}
+                          </Badge>
+                          {product.inStock ? (
+                            <Badge className="bg-green-100 text-green-800 text-xs">In Stock</Badge>
+                          ) : (
+                            <Badge variant="destructive" className="text-xs">Out of Stock</Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -205,86 +318,77 @@ export default function AdminDashboard() {
               </div>
             </CardContent>
           </Card>
-        </div>
+        )}
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Recent Activity */}
+        {recentProducts.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Quick Start</CardTitle>
+              <CardTitle className="flex items-center justify-between">
+                <span>Recently Updated Products</span>
+                {hasPermission('products', 'view') && (
+                  <Link href="/products">
+                    <Button variant="outline" size="sm">
+                      <Package className="h-4 w-4 mr-2" />
+                      Manage All
+                    </Button>
+                  </Link>
+                )}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                <Link href="/design/themes" className="block">
-                  <Button variant="outline" className="w-full justify-start">
-                    <Palette className="h-4 w-4 mr-2" />
-                    Customize Colors
-                  </Button>
-                </Link>
-                <Link href="/design/layouts" className="block">
-                  <Button variant="outline" className="w-full justify-start">
-                    <Layout className="h-4 w-4 mr-2" />
-                    Edit Page Layout
-                  </Button>
-                </Link>
-                <Link href="/design/assets" className="block">
-                  <Button variant="outline" className="w-full justify-start">
-                    <Image className="h-4 w-4 mr-2" />
-                    Upload Images
-                  </Button>
-                </Link>
+                {recentProducts.map((product) => (
+                  <div key={product.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+                    <div className="flex items-center space-x-3">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-8 h-8 rounded object-cover"
+                      />
+                      <div>
+                        <p className="text-sm font-medium">{product.name}</p>
+                        <p className="text-xs text-gray-500">{product.category} • {product.price}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-gray-500">
+                        {new Date(product.updatedAt).toLocaleDateString()}
+                      </p>
+                      <div className="flex items-center space-x-1 mt-1">
+                        {product.inStock && (
+                          <Badge variant="outline" className="text-xs">In Stock</Badge>
+                        )}
+                        {product.featured && (
+                          <Badge variant="outline" className="text-xs text-yellow-600">Featured</Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
+        )}
 
+        {/* Category Overview */}
+        {analytics?.categories && Object.keys(analytics.categories).length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Current Theme</CardTitle>
+              <CardTitle>Products by Category</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                <h3 className="font-medium">INKEY Default</h3>
-                <div className="flex space-x-2">
-                  <div className="w-6 h-6 bg-black rounded border"></div>
-                  <div className="w-6 h-6 bg-purple-400 rounded border"></div>
-                  <div className="w-6 h-6 bg-gray-200 rounded border"></div>
-                  <div className="w-6 h-6 bg-white rounded border border-gray-300"></div>
-                </div>
-                <Link href="/design/themes">
-                  <Button variant="outline" size="sm" className="w-full">
-                    Customize Theme
-                  </Button>
-                </Link>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {Object.entries(analytics.categories).map(([category, count]) => (
+                  <div key={category} className="text-center p-4 border rounded-lg">
+                    <p className="text-2xl font-bold text-gray-900">{count as number}</p>
+                    <p className="text-sm text-gray-600">{category}</p>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Design Status</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Theme</span>
-                  <span className="text-sm font-medium text-green-600">Active</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Layouts</span>
-                  <span className="text-sm font-medium text-green-600">Published</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Assets</span>
-                  <span className="text-sm font-medium text-blue-600">Optimized</span>
-                </div>
-                <Button size="sm" className="w-full bg-green-600 hover:bg-green-700">
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  All Systems Good
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        )}
       </div>
     </AdminLayout>
   );
