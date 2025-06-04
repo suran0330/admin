@@ -20,6 +20,14 @@ export const metadata: Metadata = {
   title: "INKEY List Admin Dashboard",
   description: "Comprehensive admin dashboard for managing The INKEY List store - products, orders, analytics, and design management.",
   keywords: "admin, dashboard, ecommerce, product management, analytics, orders, design management",
+  icons: {
+    icon: [
+      {
+        url: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📦</text></svg>',
+        type: 'image/svg+xml',
+      },
+    ],
+  },
 };
 
 export default function RootLayout({
