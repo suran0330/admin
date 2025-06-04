@@ -1,0 +1,50 @@
+{
+  "name": "inkey-list-admin",
+  "version": 2,
+  "framework": "nextjs",
+  "buildCommand": "bun run build",
+  "outputDirectory": ".next",
+  "installCommand": "bun install",
+  "devCommand": "bun run dev",
+  "env": {
+    "NEXT_PUBLIC_ADMIN_NAME": "INKEY List Admin",
+    "NEXT_PUBLIC_SANITY_PROJECT_ID": "zqetc89y",
+    "NEXT_PUBLIC_SANITY_DATASET": "production"
+  },
+  "build": {
+    "env": {
+      "NEXT_TELEMETRY_DISABLED": "1"
+    }
+  },
+  "functions": {
+    "app/api/**/*.js": {
+      "maxDuration": 30
+    }
+  },
+  "regions": ["iad1"],
+  "rewrites": [
+    {
+      "source": "/admin/:path*",
+      "destination": "/:path*"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    }
+  ]
+}
