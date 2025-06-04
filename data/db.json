@@ -1,0 +1,279 @@
+{
+  "products": [
+    {
+      "id": "hyaluronic-acid-serum",
+      "handle": "hyaluronic-acid-serum",
+      "title": "Hyaluronic Acid Serum",
+      "description": "A lightweight serum that holds up to 1000 times its weight in water, providing instant and long-lasting hydration for all skin types.",
+      "price": 7.99,
+      "compareAtPrice": 12.99,
+      "images": [
+        "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=400&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=400&h=400&fit=crop"
+      ],
+      "category": "serums",
+      "skinConcerns": [
+        "hydration",
+        "dryness",
+        "fine-lines"
+      ],
+      "ingredients": [
+        "hyaluronic acid",
+        "glycerin",
+        "panthenol"
+      ],
+      "inStock": true,
+      "featured": true,
+      "createdAt": "2024-06-04T01:30:00.000Z",
+      "updatedAt": "2024-06-04T01:30:00.000Z"
+    },
+    {
+      "id": "retinol-eye-cream",
+      "handle": "retinol-eye-cream",
+      "title": "Retinol Eye Cream",
+      "description": "A gentle retinol formula specifically designed for the delicate eye area, helping to reduce fine lines and improve skin texture.",
+      "price": 9.99,
+      "compareAtPrice": null,
+      "images": [
+        "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop"
+      ],
+      "category": "eye-care",
+      "skinConcerns": [
+        "fine-lines",
+        "dark-circles",
+        "anti-aging"
+      ],
+      "ingredients": [
+        "retinol",
+        "peptides",
+        "vitamin E"
+      ],
+      "inStock": true,
+      "featured": true,
+      "createdAt": "2024-06-04T01:30:00.000Z",
+      "updatedAt": "2024-06-04T01:30:00.000Z"
+    },
+    {
+      "id": "niacinamide-serum",
+      "handle": "niacinamide-serum",
+      "title": "Niacinamide",
+      "description": "A 10% niacinamide serum that helps control excess oil production and reduce the appearance of enlarged pores.",
+      "price": 5.99,
+      "compareAtPrice": null,
+      "images": [
+        "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400&h=400&fit=crop"
+      ],
+      "category": "serums",
+      "skinConcerns": [
+        "excess-oil",
+        "large-pores",
+        "acne"
+      ],
+      "ingredients": [
+        "niacinamide",
+        "zinc",
+        "salicylic acid"
+      ],
+      "inStock": false,
+      "featured": false,
+      "createdAt": "2024-06-04T01:30:00.000Z",
+      "updatedAt": "2024-06-04T01:30:00.000Z"
+    },
+    {
+      "id": "vitamin-c-serum",
+      "handle": "vitamin-c-serum",
+      "title": "Vitamin C Serum",
+      "description": "A potent vitamin C serum that brightens skin and helps reduce dark spots for a more even complexion.",
+      "price": 9.99,
+      "compareAtPrice": 12.99,
+      "images": [
+        "https://images.unsplash.com/photo-1571875257727-256c39da42af?w=400&h=400&fit=crop"
+      ],
+      "category": "serums",
+      "skinConcerns": [
+        "dark-spots",
+        "dullness",
+        "uneven-tone"
+      ],
+      "ingredients": [
+        "vitamin C",
+        "vitamin E",
+        "ferulic acid"
+      ],
+      "inStock": true,
+      "featured": false,
+      "createdAt": "2024-06-04T01:30:00.000Z",
+      "updatedAt": "2024-06-04T01:30:00.000Z"
+    },
+    {
+      "id": "caffeine-eye-serum",
+      "handle": "caffeine-eye-serum",
+      "title": "Caffeine Eye Serum",
+      "description": "A caffeine-infused eye serum that helps reduce puffiness and the appearance of dark circles.",
+      "price": 6.99,
+      "compareAtPrice": null,
+      "images": [
+        "https://images.unsplash.com/photo-1594824704818-61db69c33bb3?w=400&h=400&fit=crop"
+      ],
+      "category": "eye-care",
+      "skinConcerns": [
+        "puffiness",
+        "dark-circles",
+        "tired-eyes"
+      ],
+      "ingredients": [
+        "caffeine",
+        "peptides",
+        "hyaluronic acid"
+      ],
+      "inStock": true,
+      "featured": true,
+      "createdAt": "2024-06-04T01:30:00.000Z",
+      "updatedAt": "2024-06-04T01:30:00.000Z"
+    },
+    {
+      "id": "salicylic-acid-cleanser",
+      "handle": "salicylic-acid-cleanser",
+      "title": "Salicylic Acid Cleanser",
+      "description": "A gentle yet effective cleanser with salicylic acid that deeply cleanses and helps unclog pores.",
+      "price": 8.99,
+      "compareAtPrice": null,
+      "images": [
+        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop"
+      ],
+      "category": "cleansers",
+      "skinConcerns": [
+        "acne",
+        "blackheads",
+        "clogged-pores"
+      ],
+      "ingredients": [
+        "salicylic acid",
+        "glycolic acid",
+        "niacinamide"
+      ],
+      "inStock": true,
+      "featured": false,
+      "createdAt": "2024-06-04T01:30:00.000Z",
+      "updatedAt": "2024-06-04T01:30:00.000Z"
+    },
+    {
+      "id": "1749022753145-fqgi5i3",
+      "handle": "test-product",
+      "title": "Test Product",
+      "description": "A test product",
+      "price": 9.99,
+      "images": [],
+      "category": "serums",
+      "skinConcerns": [],
+      "ingredients": [],
+      "inStock": true,
+      "featured": false,
+      "createdAt": "2025-06-04T07:39:13.145Z",
+      "updatedAt": "2025-06-04T07:39:13.145Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": "serums",
+      "name": "Serums",
+      "handle": "serums",
+      "description": "Targeted treatments for specific skin concerns"
+    },
+    {
+      "id": "cleansers",
+      "name": "Cleansers",
+      "handle": "cleansers",
+      "description": "Daily cleansing products for all skin types"
+    },
+    {
+      "id": "eye-care",
+      "name": "Eye Care",
+      "handle": "eye-care",
+      "description": "Specialized products for the delicate eye area"
+    },
+    {
+      "id": "moisturizers",
+      "name": "Moisturizers",
+      "handle": "moisturizers",
+      "description": "Hydrating products for daily skincare routine"
+    }
+  ],
+  "skinConcerns": [
+    {
+      "id": "hydration",
+      "name": "Hydration",
+      "handle": "hydration"
+    },
+    {
+      "id": "dryness",
+      "name": "Dryness",
+      "handle": "dryness"
+    },
+    {
+      "id": "fine-lines",
+      "name": "Fine Lines",
+      "handle": "fine-lines"
+    },
+    {
+      "id": "dark-circles",
+      "name": "Dark Circles",
+      "handle": "dark-circles"
+    },
+    {
+      "id": "anti-aging",
+      "name": "Anti-Aging",
+      "handle": "anti-aging"
+    },
+    {
+      "id": "excess-oil",
+      "name": "Excess Oil",
+      "handle": "excess-oil"
+    },
+    {
+      "id": "large-pores",
+      "name": "Large Pores",
+      "handle": "large-pores"
+    },
+    {
+      "id": "acne",
+      "name": "Acne",
+      "handle": "acne"
+    },
+    {
+      "id": "dark-spots",
+      "name": "Dark Spots",
+      "handle": "dark-spots"
+    },
+    {
+      "id": "dullness",
+      "name": "Dullness",
+      "handle": "dullness"
+    },
+    {
+      "id": "uneven-tone",
+      "name": "Uneven Tone",
+      "handle": "uneven-tone"
+    },
+    {
+      "id": "puffiness",
+      "name": "Puffiness",
+      "handle": "puffiness"
+    },
+    {
+      "id": "tired-eyes",
+      "name": "Tired Eyes",
+      "handle": "tired-eyes"
+    },
+    {
+      "id": "blackheads",
+      "name": "Blackheads",
+      "handle": "blackheads"
+    },
+    {
+      "id": "clogged-pores",
+      "name": "Clogged Pores",
+      "handle": "clogged-pores"
+    }
+  ]
+}
